@@ -1,3 +1,5 @@
+# How to join three table by Laravel eloquent model
+---
 <p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
 
 <p align="center">
@@ -7,45 +9,105 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
 </p>
 
-## About Laravel
+## My schema 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+<p align="center"><img src="http://www.amirhome.com//public/uploads/lessons/schema-How-to-join-three-table-by-laravel-eloquent-model-php-mysql-laravel.PNG"></p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+I have three table:
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications. A superb combination of simplicity, elegance, and innovation give you tools you need to build any application with which you are tasked.
+- Articles table
+- Categories table
+- Users table
 
-## Learning Laravel
+I want to show articles with their category name instead of category_id and user_name instead of user_id I try like these query It is work!
+But I want to do by Eloquent way.
 
-Laravel has the most extensive and thorough documentation and video tutorial library of any modern web application framework. The [Laravel documentation](https://laravel.com/docs) is thorough, complete, and makes it a breeze to get started learning the framework.
+```
+$articles =DB::table('articles')
+                ->join('categories', 'articles.id', '=', 'categories.id')
+                ->join('users', 'users.id', '=', 'articles.user_id')
+                ->select('articles.id','articles.title','articles.body','users.username', 'category.name')
+                ->get();
+```
+ Please, how could I do?
 
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 900 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
+## Learning Laravel Eloquent for Join
 
-## Laravel Sponsors
+With Eloquent its very easy to retrieve relational data checkout following example with your senario in Laravel 5, we have three models:
 
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](http://patreon.com/taylorotwell):
+- Article (belongs to user and category)
+- Category (has many articles)
+- User (has many articles)
 
-- **[Vehikl](http://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Styde](https://styde.net)**
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
+### Article Model
 
-## Contributing
+```
+class Article extends Model
+{
+    //
+    protected $fillable = [
+        'title', 'text', 'user_id','categories_id',
+    ];
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+    public function user()
+    {
+    	return $this->belongsTo('App\User');
+    }
 
-## Security Vulnerabilities
+    public function category()
+    {
+    	return $this->belongsTo('App\Category');
+    }
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+### Category Model
 
-## License
+```
+class Category extends Model
+{
+    //
+    protected $fillable = [
+        'name',
+    ];
+	
+	public function articles()
+	{
+		return $this->HasMany('App\Article');
+	}
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+}
+```
+
+### User Model
+
+```
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'email', 'password',
+    ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+        
+    public function articles()
+    {
+        return $this->HasMany('App\Article');
+    }
+}
+```
