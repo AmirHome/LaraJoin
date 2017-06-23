@@ -39,7 +39,7 @@ With Eloquent its very easy to retrieve relational data checkout following examp
 - Category (has many articles)
 - User (has many articles)
 
-### Article Model
+#### Article Model
 
 ```
 class Article extends Model
@@ -61,7 +61,7 @@ class Article extends Model
 }
 ```
 
-### Category Model
+#### Category Model
 
 ```
 class Category extends Model
@@ -79,7 +79,7 @@ class Category extends Model
 }
 ```
 
-### User Model
+#### User Model
 
 ```
 class User extends Authenticatable
@@ -111,3 +111,24 @@ class User extends Authenticatable
     }
 }
 ```
+
+### Home Controller
+```
+    public function index()
+    {
+        //
+    	$articles = Article::with(['user', 'category'])->get();
+
+    	$users = User::with('articles')->get();
+
+    	$categories = Category::with('articles')->get();
+
+        dd(['articles' => $articles->toarray(),
+        	'users' => $users->toarray(),
+        	'categories' => $categories->toarray(),
+        ]);
+    }
+```
+
+### Result
+<p align="center"><img src="http://www.amirhome.com//public/uploads/lessons/result-How-to-join-three-table-by-laravel-eloquent-model-php-mysql-laravel.PNG"></p>

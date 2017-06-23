@@ -22,9 +22,9 @@ class HomeController extends Controller
 
     	$categories = Category::with('articles')->get();
 
-        dd(['articles' => $articles->toarray(),
-        	'users' => $users->toarray(),
-        	'categories' => $categories->toarray(),
+        dd(['Articles' => $articles->toarray(),
+        	'Users' => $users->toarray(),
+        	'Categories' => $categories->toarray(),
         ]);
     }
 
